@@ -99,8 +99,12 @@ func (m *BotStatesManager) defineNewState(
 			return handlerResponse
 		}
 	}
-
-	handlerResponse = currentState.Handler(c)
+	if currentState.Handler != nil {
+		handlerResponse = currentState.Handler(c)
+	} else {
+		log.Print("No handler for " + currentState.BotStateName + "!")
+		handlerResponse = HandlerResponse{}
+	}
 	return handlerResponse
 }
 

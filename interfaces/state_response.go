@@ -1,8 +1,8 @@
-package teleBotStateLib
+package interfaces
 
-type StringifyArray interface {
-	ToStringArray(c BotContext) ([]string, error)
-}
+import (
+	. "github.com/Ewasince/go-telegram-state-bot/enums"
+)
 
 type HandlerResponse struct {
 	NextState      *BotState // which state should go next

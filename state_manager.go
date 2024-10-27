@@ -1,28 +1,32 @@
 package teleBotStateLib
 
+import (
+	. "github.com/Ewasince/go-telegram-state-bot/interfaces"
+)
+
 type StateCacheManager interface {
 	SetState(int64, *BotState) error
 	GetState(int64) *BotState
 }
 
-type BaseStateCacheManager struct {
+type baseStateCacheManager struct {
 	StatesCache  map[int64]*BotState
 	DefaultState *BotState
 }
 
 func NewBaseStateCacheManager(defaultState *BotState) StateCacheManager {
-	return &BaseStateCacheManager{
+	return &baseStateCacheManager{
 		StatesCache:  map[int64]*BotState{},
 		DefaultState: defaultState,
 	}
 }
 
-func (s *BaseStateCacheManager) SetState(key int64, botState *BotState) error {
-	s.StatesCache[key] = botState
+func (s *baseStateCacheManager) SetState(key int64, BaseBotState *BotState) error {
+	s.StatesCache[key] = BaseBotState
 	return nil
 }
 
-func (s *BaseStateCacheManager) GetState(key int64) *BotState {
+func (s *baseStateCacheManager) GetState(key int64) *BotState {
 	state, exists := s.StatesCache[key]
 	if !exists {
 		return s.DefaultState

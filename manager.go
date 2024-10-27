@@ -1,7 +1,8 @@
 package teleBotStateLib
 
 import (
-	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/Ewasince/go-telegram-state-bot/enums"
+	. "github.com/Ewasince/go-telegram-state-bot/interfaces"
 	"log"
 )
 
@@ -34,23 +35,14 @@ func (m *BotStatesManager) ProcessMessage(c BotContext) {
 	var handlerResponse HandlerResponse
 	var isCommandProcessed bool
 
-	var callCount = c.incCallCount()
-
-	defer func() {
-		if r := recover(); r != nil {
-			if callCount == 1 {
-				c.SendErrorMessage()
-			}
-			panic(r)
-		}
-	}()
+	var callCount = c.IncCallCount()
 
 	if callCount > MaxCallCount {
 		panic(ToManyCalls)
 	}
 
-	currentState := m.StateManger.GetState(c.GetMessageSenderId())
-	c.SetKeyboard(currentState.Keyboard)
+	currentState := *m.StateManger.GetState(c.GetMessageSenderId())
+	c.SetKeyboard(currentState.GetKeyboard())
 
 	handlerResponse, isCommandProcessed = m.processCommand(c)
 	if !isCommandProcessed {
@@ -58,24 +50,24 @@ func (m *BotStatesManager) ProcessMessage(c BotContext) {
 	}
 
 	switch handlerResponse.TransitionType {
-	case GoState:
+	case enums.GoState:
 		newState := handlerResponse.NextState
-		err = m.transactToNewState(c, currentState, newState, false)
+		err = m.transactToNewState(c, currentState, *newState, false)
 		if err != nil {
 			panic(err)
 		}
-	case ReloadState:
+	case enums.ReloadState:
 		err = m.transactToNewState(c, currentState, currentState, false)
 		if err != nil {
 			panic(err)
 		}
-	case GoStateForce:
+	case enums.GoStateForce:
 		newState := handlerResponse.NextState
-		err = m.transactToNewState(c, currentState, newState, true)
+		err = m.transactToNewState(c, currentState, *newState, true)
 		if err != nil {
 			panic(err)
 		}
-	case GoStateInPlace:
+	case enums.GoStateInPlace:
 		err = m.StateManger.SetState(c.GetMessageSenderId(), handlerResponse.NextState)
 		if err != nil {
 			panic(err)
@@ -88,21 +80,21 @@ func (m *BotStatesManager) ProcessMessage(c BotContext) {
 // defineNewState returns new bot state id, new state availability flag and error
 func (m *BotStatesManager) defineNewState(
 	c BotContext,
-	currentState *BotState,
+	currentState BotState,
 ) HandlerResponse {
 	var handlerResponse HandlerResponse
 	var buttonPressed bool
 
-	if currentState.Keyboard != nil {
-		handlerResponse, buttonPressed = currentState.Keyboard.ProcessMessage(c)
+	if kb := currentState.GetKeyboard(); kb != nil {
+		handlerResponse, buttonPressed = kb.ProcessMessage(c)
 		if buttonPressed {
 			return handlerResponse
 		}
 	}
-	if currentState.Handler != nil {
-		handlerResponse = currentState.Handler(c)
+	if handler := currentState.GetHandler(); handler != nil {
+		handlerResponse = handler(c)
 	} else {
-		log.Print("No handler for " + currentState.BotStateName + "!")
+		log.Print("No handler for " + currentState.GetBotStateName() + "!")
 		handlerResponse = HandlerResponse{}
 	}
 	return handlerResponse
@@ -110,48 +102,36 @@ func (m *BotStatesManager) defineNewState(
 
 func (m *BotStatesManager) transactToNewState(
 	c BotContext,
-	currentState *BotState,
-	newState *BotState,
+	currentState BotState,
+	newState BotState,
 	forceTransition bool,
 ) error {
-	var messages []string
+	var messages []StateChattable
 	var err error
 
-	if !forceTransition && currentState.MessageExit != nil {
-		exitMessages, err := currentState.MessageExit.ToStringArray(c)
+	if extMsg := currentState.GetMessageExit(); !forceTransition && extMsg != nil {
+		exitMessages, err := extMsg.ToTgMessages(c)
 		if err != nil {
 			panic(err)
 		}
 		messages = append(messages, exitMessages...)
 	}
 
-	if newState.MessageEnter != nil {
-		enterMessages, err := newState.MessageEnter.ToStringArray(c)
+	if entMsg := newState.GetMessageEnter(); entMsg != nil {
+		enterMessages, err := entMsg.ToTgMessages(c)
 		if err != nil {
 			panic(err)
 		}
 		messages = append(messages, enterMessages...)
 	}
 
-	if len(messages) > 0 {
-		var messagesForSend = c.CreateMessages(messages...)
-		lastMessageForSend := &messagesForSend[len(messagesForSend)-1]
-		if newState.Keyboard != nil {
-			lastMessageForSend.ReplyMarkup = newState.Keyboard.GetKeyBoard()
-		} else {
-			lastMessageForSend.ReplyMarkup = tg.NewRemoveKeyboard(true)
-		}
-
-		var chattableMessages []tg.Chattable
-		for _, msg := range messagesForSend {
-			chattableMessages = append(chattableMessages, msg)
-		}
-		c.SendMessages(chattableMessages...)
-	} else if newState.Keyboard != nil {
-		log.Panicf("in state %s defined keyboard without enter message!", newState.BotStateName)
+	if newKeyboard := newState.GetKeyboard(); len(messages) > 0 {
+		c.SendChattables(newKeyboard, messages...)
+	} else if newKeyboard != nil {
+		log.Panicf("in state %s defined keyboard without enter message!", newState.GetBotStateName())
 	}
 
-	err = m.StateManger.SetState(c.GetMessageSenderId(), newState)
+	err = m.StateManger.SetState(c.GetMessageSenderId(), &newState)
 	if err != nil {
 		panic(err)
 	}

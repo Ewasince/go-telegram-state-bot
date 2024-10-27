@@ -1,6 +1,9 @@
-package teleBotStateLib
+package keyboard
 
-import tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+import (
+	. "github.com/Ewasince/go-telegram-state-bot/interfaces"
+	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+)
 
 type BotButton struct {
 	ButtonTitle   string
@@ -12,7 +15,7 @@ type BotKeyboard struct {
 	Keyboard []ButtonsRow
 }
 
-func (b *BotKeyboard) GetKeyBoard() tg.ReplyKeyboardMarkup {
+func (b *BotKeyboard) GetKeyBoard() *tg.ReplyKeyboardMarkup {
 	var buttonsArray [][]tg.KeyboardButton
 
 	for _, row := range b.Keyboard {
@@ -28,10 +31,10 @@ func (b *BotKeyboard) GetKeyBoard() tg.ReplyKeyboardMarkup {
 	keyboard := tg.ReplyKeyboardMarkup{
 		Keyboard: buttonsArray,
 	}
-	return keyboard
+	return &keyboard
 }
 
-// ProcessMessage return bot state id, is new state, is button pressed and error
+// ProcessMessage return bot state id, is new state and is button pressed
 func (b *BotKeyboard) ProcessMessage(c BotContext) (HandlerResponse, bool) {
 	for _, row := range b.Keyboard {
 		for _, button := range row {

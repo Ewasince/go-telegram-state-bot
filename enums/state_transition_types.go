@@ -1,4 +1,4 @@
-package teleBotStateLib
+package enums
 
 type StateTransitionType uint
 

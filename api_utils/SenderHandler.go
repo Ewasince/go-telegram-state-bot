@@ -1,4 +1,4 @@
-package apiUtils
+package api_utils
 
 import (
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -7,7 +7,7 @@ import (
 )
 
 type SenderHandler interface {
-	SendMessage(tg.Chattable) error
+	SendChattable(tg.Chattable) error
 }
 
 type BaseSenderHandler struct {
@@ -15,7 +15,7 @@ type BaseSenderHandler struct {
 	BotMutex *sync.Mutex
 }
 
-func (b *BaseSenderHandler) SendMessage(msg tg.Chattable) error {
+func (b *BaseSenderHandler) SendChattable(msg tg.Chattable) error {
 	b.BotMutex.Lock()
 	defer b.BotMutex.Unlock()
 	if _, err := b.BotApi.Send(msg); err != nil {

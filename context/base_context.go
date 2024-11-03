@@ -14,13 +14,11 @@ type BaseBotContext struct {
 	DefaultKeyboard Keyboard
 	BotHandler      SenderHandler
 	CallCount       uint
-	ErrorMessage    string
 }
 
-func NewContext(
+func NewBaseContext(
 	message *tg.Message,
 	senderHandler *api_utils.BaseSenderHandler,
-	errorMessage string,
 ) *BaseBotContext {
 	return &BaseBotContext{
 		MessageText:     message.Text,
@@ -28,7 +26,6 @@ func NewContext(
 		MessageSenderId: message.From.ID,
 		MessageChatId:   message.Chat.ID,
 		BotHandler:      senderHandler,
-		ErrorMessage:    errorMessage,
 	}
 }
 

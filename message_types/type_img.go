@@ -16,7 +16,7 @@ type imgMessage struct {
 }
 
 func NewImgMessage(imagePath, imageName string) Messagables {
-	if _, err := os.Stat("/path/to/whatever"); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(imagePath); errors.Is(err, os.ErrNotExist) {
 		panic("Not found image for path: " + imagePath)
 	}
 	return &imgMessage{

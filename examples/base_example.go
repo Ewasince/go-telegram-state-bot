@@ -1,35 +1,4 @@
-# Go Telegram State Bot
-
-
-This package was developed for building telegram bots based on state logic
-
-## Getting started
-
-### Prerequisites
-
-**Go Telegram State Bot** requires [Go](https://go.dev/) version [1.22](https://go.dev/doc/devel/release#go1.22.0) or above.
-
-### Getting Go Telegram State Bot
-
-With [Go's module support](https://go.dev/wiki/Modules#how-to-use-modules), `go [build|run|test]` automatically fetches the necessary dependencies when you add the import in your code:
-
-```sh
-import "github.com/Ewasince/go-telegram-state-bot"
-```
-
-Alternatively, use `go get`:
-
-```sh
-go get github.com/Ewasince/go-telegram-state-bot
-```
-
-### Running Go Telegram State Bot
-
-A basic example:
-
-```go
-package main
-
+package examples
 
 import (
 	"github.com/Ewasince/go-telegram-state-bot"
@@ -60,8 +29,8 @@ var echoState = states.NewBotState(
 	},
 )
 
-func main() {
-	bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+func MainBase() {
+	bot, err := tgbotapi.NewBotAPI("YOUR_TOKEN")
 	if err != nil {
 		log.Panic(err)
 	}
@@ -103,27 +72,3 @@ func main() {
 		manager.ProcessMessage(ctx)
 	}
 }
-
-```
-
-This example also located in [Base Example](examples/base_example.go)
-
-To run the code, use the `go run` command, like:
-
-```sh
-$ go run example.go
-```
-
-Type `/start` or any other text to your bot for example
-
-### See more examples
-
-#### Examples
-
-Advanced example located in [Advanced Example](examples/advance_example.go), 
-which includes besides state also keyboard, command and more other features. 
-
-## Documentation
-
-Documentation will appear when at least one person start using this module. 
-Currently, all functionality can be understood based on [Advanced Example](examples/advance_example.go).

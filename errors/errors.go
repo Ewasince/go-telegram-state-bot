@@ -1,4 +1,4 @@
-package teleBotStateLib
+package errors
 
 import "errors"
 

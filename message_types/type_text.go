@@ -6,11 +6,9 @@ import (
 	tg "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type TextMessage string
+var _ Messagables = (*TextMessage)(nil) // interface hint
 
-//func NewTextMessage(messageText string) Messagables {
-//	return TextMessage(messageText)
-//}
+type TextMessage string
 
 func (t TextMessage) ToTgMessages(c BotContext) ([]StateChattable, error) {
 	message := tg.NewMessage(c.GetMessageChatId(), string(t))

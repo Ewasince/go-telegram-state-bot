@@ -2,7 +2,9 @@ package teleBotStateLib
 
 import (
 	"github.com/Ewasince/go-telegram-state-bot/enums"
+	"github.com/Ewasince/go-telegram-state-bot/errors"
 	. "github.com/Ewasince/go-telegram-state-bot/interfaces"
+	"github.com/Ewasince/go-telegram-state-bot/models"
 	"log"
 )
 
@@ -11,15 +13,15 @@ const (
 )
 
 type BotStatesManager struct {
-	BotCommands map[string]BotCommand
+	BotCommands map[string]models.BotCommand
 	StateManger StateCacheManager
 }
 
 func NewBotStatesManager(
-	botCommands []BotCommand,
+	botCommands []models.BotCommand,
 	stateManager StateCacheManager,
 ) *BotStatesManager {
-	botCommandsMap := make(map[string]BotCommand, len(botCommands))
+	botCommandsMap := make(map[string]models.BotCommand, len(botCommands))
 	for _, botCommand := range botCommands {
 		botCommandsMap[botCommand.CommandMessage] = botCommand
 	}
@@ -38,7 +40,7 @@ func (m *BotStatesManager) ProcessMessage(c BotContext) {
 	var callCount = c.IncCallCount()
 
 	if callCount > MaxCallCount {
-		panic(ToManyCalls)
+		panic(errors.ToManyCalls)
 	}
 
 	currentState := *m.StateManger.GetState(c.GetMessageSenderId())

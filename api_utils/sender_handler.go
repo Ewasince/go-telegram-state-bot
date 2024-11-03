@@ -6,10 +6,6 @@ import (
 	"sync"
 )
 
-type SenderHandler interface {
-	SendChattable(tg.Chattable) error
-}
-
 type BaseSenderHandler struct {
 	BotApi   *tg.BotAPI
 	BotMutex *sync.Mutex

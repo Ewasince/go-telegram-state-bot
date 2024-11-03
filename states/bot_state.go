@@ -1,7 +1,8 @@
 package states
 
 import (
-	"github.com/Ewasince/go-telegram-state-bot"
+	"github.com/Ewasince/go-telegram-state-bot/errors"
+
 	//. "github.com/Ewasince/go-telegram-state-bot/types"
 	. "github.com/Ewasince/go-telegram-state-bot/interfaces"
 )
@@ -22,7 +23,7 @@ func NewBotState(
 	Handler ContextHandler,
 ) BotState {
 	if Keyboard != nil && MessageEnter == nil {
-		panic(teleBotStateLib.KeyboardAndEnterMessage)
+		panic(errors.KeyboardAndEnterMessage)
 	}
 	return baseBotState{
 		BotStateName,

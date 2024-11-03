@@ -1,4 +1,4 @@
-package teleBotStateLib
+package models
 
 import (
 	. "github.com/Ewasince/go-telegram-state-bot/interfaces"

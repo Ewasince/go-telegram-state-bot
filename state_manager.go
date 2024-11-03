@@ -4,11 +4,6 @@ import (
 	. "github.com/Ewasince/go-telegram-state-bot/interfaces"
 )
 
-type StateCacheManager interface {
-	SetState(int64, *BotState) error
-	GetState(int64) *BotState
-}
-
 type baseStateCacheManager struct {
 	StatesCache  map[int64]*BotState
 	DefaultState *BotState

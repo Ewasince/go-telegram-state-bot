@@ -12,7 +12,7 @@ type BaseBotContext struct {
 	MessageSenderId int64
 	MessageChatId   int64
 	DefaultKeyboard Keyboard
-	BotHandler      api_utils.SenderHandler
+	BotHandler      SenderHandler
 	CallCount       uint
 	ErrorMessage    string
 }
